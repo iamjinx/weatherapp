@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[url('/background.jpg')] bg-no-repeat bg-fixed bg-cover bg-center flex flex-col items-center justify-center p-2 pt-14">
+
+    <div class="flex flex-col justify-center items-center gap-1 font-mono">
+        <input type="text" id="location" class="text-white bg-black backdrop-blur-xl bg-opacity-25 w-48 h-8 rounded outline-none border-zinc-950 border-2 p-2 placeholder-slate-600" placeholder="Your location" pattern="[a-zA-Z]+" autocomplete="off" required>
+        <button type="submit" id="get-weather" class="bg-amber-500 border-zinc-950 border-2 rounded p-0.5 w-24 text-white hover:bg-amber-400 ease-linear eae">Search</button>
+    </div>
+
+    <h1 class="mt-12 text-white bg-black backdrop-blur-xl rounded px-16 py-0.5 bg-opacity-25 drop-shadow-md font-bold">Weather Information</h1>
+    <div class="flex flex-col gap-5 text-white w-72 mt-1 bg-black backdrop-blur-xl rounded px-3 py-5 bg-opacity-25 drop-shadow-md" id="weather-info">
+        <div class="flex gap-28 justify-around">
+            <div class="font-semibold text-3xl mt-3" id="temp"></div>
+            <div class="font-semibold w-14 mt-1" id="icon"><img id="weather-icon" src="" alt="Weather Icon"></div>
+        </div>
+        <div class="font-semibold" id="condition"></div>
+        <div class="font-semibold" id="precipitation"></div>
+        <div class="font-semibold" id="feels-like"></div>
+        <div class="font-semibold" id="humidity"></div>
+        <div class="font-semibold" id="last-updated"></div>
+    </div>
+
+    <p class="mt-36 font-mono text-white text-xs text-center bg-black backdrop-blur-xl rounded px-4 py-0.5 bg-opacity-25 drop-shadow-md">Created by <a href="https://github.com/iamjinx/" class="text-red-500 font-bold"> @iamjinx </a>| API used WeatherAPI.com</p>
+
+    <!-- main java script -->
+    <script>
+        const apiKey = 'b98658f7b4ef456f85a23957231909';
+
+        function fetchWeather(location) {
+            const apiUrl = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    // Populate individual divs with weather information
+                    document.getElementById('temp').textContent = `${data.current.temp_c}°C`;
+                    document.getElementById('condition').textContent = `Condition : ${data.current.condition.text}`;
+                    document.getElementById('humidity').textContent = `Humidity : ${data.current.humidity}%`;
+                    document.getElementById('precipitation').textContent = `Precipitation : ${data.current.precip_mm} mm`;
+                    
+                    // Set the src attribute of the weather icon image
+                    const weatherIcon = document.getElementById('weather-icon');
+                    weatherIcon.src = `https:${data.current.condition.icon}`;
+                    weatherIcon.alt = 'Weather Icon';
+                    
+                    document.getElementById('feels-like').textContent = `Feels Like : ${data.current.feelslike_c}°C`;
+                    document.getElementById('last-updated').textContent = `Last Updated : ${data.current.last_updated}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching weather data:', error);
+                    const weatherInfo = document.getElementById('weather-info');
+                    weatherInfo.innerHTML = 'Sorry, please try searching again.';
+                });
+        }
+
+        const defaultLocation = 'Bangalore';
+        fetchWeather(defaultLocation);
+
+        document.getElementById('get-weather').addEventListener('click', () => {
+            const locationInput = document.getElementById('location');
+            const location = locationInput.value.trim();
+
+            if (location !== '') {
+                fetchWeather(location);
+            }
+        });
+    </script>
+</body>
+</html>
